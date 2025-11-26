@@ -6,18 +6,20 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
-import java.util.List;
+
 
 public class DomaciPonedeljak2411 {
 
 
     //Testirati prijavu na sajt https://demoqa.com/login pomocu kolacica
-    //Test postavlja potrebne kolacice i otvara stranicu za prijavu kako bi simulirao ulogovanog korisnika, zatim brise kolacice i proverava da li je korisnik izlogovan
+    //Test postavlja potrebne kolacice i otvara stranicu za prijavu kako bi simulirao ulogovanog korisnika,
+    //zatim brise kolacice i proverava da li je korisnik izlogovan
     //Koristiit anotacije
 
 
@@ -25,7 +27,7 @@ public class DomaciPonedeljak2411 {
     WebDriverWait wait;
 
     @BeforeClass
-    public void Object() {
+    public void setUp() {
 
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
@@ -36,30 +38,31 @@ public class DomaciPonedeljak2411 {
     }
 
     @BeforeMethod
-    public void logIn() throws InterruptedException {
+    public void openlogInPage() {
         driver.navigate().to("https://demoqa.com/login");
-
-        WebElement userNameField = driver.findElement(By.id("userName"));
-        userNameField.sendKeys("testUser");
-
-        WebElement passwordField = driver.findElement(By.id("password"));
-        passwordField.sendKeys("Password@123");
-
-        Thread.sleep(3000);
-        WebElement loginButton = driver.findElement(By.id("login"));
-        loginButton.click();
-        Thread.sleep(3000);
-
-        List<WebElement> listOfButtonsAfterLogedIn = driver.findElements(By.id("submit"));
-        for (WebElement button : listOfButtonsAfterLogedIn) {
-            if (button.getText().equals("Log in"))
-                Assert.assertTrue(button.getText().contains("Log in"));
-        }
+        driver.manage().deleteAllCookies();
+        driver.navigate().refresh();
 
     }
 
     @Test
-    public void logedInUser() {
+    public void logedInUser() throws InterruptedException {
+        Cookie userID = new Cookie("userID", "c10e212c-6928-4f60-ac54-2b2e42fc3723");
+        Cookie token = new Cookie("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InRlc3R1c2VyIiwicGFzc3dvcmQiOiJQYXNzd29yZEAxMjMiLCJpYXQiOjE3NjQxMTM4MTl9.Sa_VJ3gfeUO-KLZzMy3Y1WloXl48vq_DcwFRTUAlcBI");
+        Cookie expires = new Cookie("expires", "2025-12-02T23%3A36%3A59.920Z");
+
+        driver.manage().addCookie(userID);
+        driver.manage().addCookie(token);
+        driver.manage().addCookie(expires);
+        driver.navigate().refresh();
+        Thread.sleep(3000);
+
+        driver.manage().deleteAllCookies();
+        driver.navigate().refresh();
+
+        WebElement logInButton = driver.findElement(By.id("login"));
+        Assert.assertTrue(logInButton.isDisplayed());
 
     }
+
 }
